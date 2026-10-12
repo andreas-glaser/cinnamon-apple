@@ -1,6 +1,7 @@
 # macOS keyboard layout everywhere via Toshy (https://github.com/RedBearAK/toshy).
 # On a PC keyboard: Alt acts as Cmd, Win as Option, Ctrl as Ctrl. Alt+C/V/X/Z
 # work in every app, including terminals, where Ctrl+C still interrupts.
+# Apps matching PC_KEYBOARD_APPS in config.sh, such as games, are left unremapped.
 
 TOSHY_TAG=Toshy_v26.08.0
 TOSHY_COMMIT=c39ee06d8d7fa299a082034d75275e6da97e0275
@@ -29,5 +30,7 @@ fi
 
 # The terminal paste override checks the clipboard for images with xclip.
 apt_install xclip
-python3 -I "$ROOT/files/toshy_apply_keymap.py" "$toshy_config" "$ROOT/files/toshy_keymap.py"
+read -r -a pc_keyboard_apps <<<"$PC_KEYBOARD_APPS"
+python3 -I "$ROOT/files/toshy_apply_config.py" "$toshy_config" "$ROOT/files/toshy_keymap.py" \
+    "${pc_keyboard_apps[@]}"
 systemctl --user restart toshy-config.service

@@ -49,13 +49,27 @@ hash verified) so a PC keyboard behaves like a Mac one in every app:
 Alt+C/V/X/Z/A/T/W/F work as on macOS, in terminals too (where Ctrl+C still
 interrupts). In terminals Alt+V sends Ctrl+V when the clipboard holds an image,
 so tools like Claude Code can paste screenshots, and Ctrl+Shift+V otherwise.
-The other shortcuts in this README keep working because a small keymap translates them for Cinnamon; it lives in Toshy's `user_apps` slice in
+The other shortcuts in this README keep working because a small keymap
+translates them for Cinnamon; it lives in Toshy's `user_apps` slice in
 `~/.config/toshy/toshy_config.py` between `cinnamon-apple` markers and survives
 Toshy upgrades. Anything else you put in that slice is left alone.
 
+Games get the plain PC keyboard: Alt is Alt and none of the Mac shortcuts
+apply. Toshy treats them like a virtual machine or remote desktop, which it
+leaves unremapped. `PC_KEYBOARD_APPS` in `config.sh` lists them as patterns
+matched against the window class; the default covers Steam games through
+Proton, anything running in Wine (Lutris, Heroic, Bottles) and gamescope. For a
+native game, run `xprop WM_CLASS`, click its window, add the class to the list
+and re-run `./install.sh keyboard`. To switch remapping off for everything,
+use Stop Toshy Services in the Toshy tray menu (Re/Start turns it back on).
+
+Cinnamon's own shortcuts from the other modules (Alt+Q, Alt+H, Alt+M,
+Alt+Space, Shift+Alt+3/4/5) still work in those apps. If a game uses one of
+them, skip the module that sets it.
+
 The Toshy installer runs only if Toshy is not installed yet; re-running the
-module just refreshes the keymap. Its questions are pre-answered, so expect
-only the sudo password prompt.
+module just refreshes the keymap and the app list. Its questions are
+pre-answered, so expect only the sudo password prompt.
 
 Security: Toshy reads all keyboard input and injects key events. Its installer
 grants your user access to input devices and `/dev/uinput` (udev rule plus the
@@ -132,6 +146,12 @@ bash ~/.local/state/cinnamon-apple/panel-backup.sh
 
 Drop a `modules/<name>.sh` file in. It is sourced by `install.sh`, so it can use
 the helpers in `lib.sh` (`log`, `apt_install`, `set_keybinding`).
+
+## Tests
+
+```sh
+python3 -B -m unittest discover -s tests
+```
 
 ## License
 
