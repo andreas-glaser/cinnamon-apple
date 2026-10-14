@@ -37,6 +37,7 @@ run, e.g. `DOCK_POSITION=left ./install.sh dock`.
 | `dock`        | Plank dock at the bottom, panel at the top as menu bar |
 | `toggle`      | Ctrl+Alt+Win+M switches the Mac keyboard off and on    |
 | `appearance`  | Ctrl+Alt+Win+D switches between dark and light mode    |
+| `terminal`    | Terminator light/dark profiles that follow the mode    |
 
 ### Keyboard
 
@@ -170,6 +171,24 @@ To switch other things along, put an executable in
 or `light` as its argument, e.g. a script that changes the terminal's profile.
 
 From a terminal: `cinnamon-apple-appearance`, or `cinnamon-apple-appearance dark` / `light`.
+
+### Terminal
+
+Installs Terminator and gives it two profiles, `light` (GitHub Light colours)
+and `dark` (One Dark). A small Terminator plugin follows Dark mode under System
+Settings > Themes, which the [appearance](#appearance) shortcut also sets: open
+terminals on `light`, `dark` or `default` switch at once, and new windows open
+with the matching profile. Mixed mode counts as light. Terminals you put on
+another profile yourself keep it.
+
+Claude Code with its theme set to `auto` (`/theme`) and Codex take their colours
+from the terminal, so they switch along.
+
+The profiles start as copies of `default`, so your font and scrollback carry
+over; re-running the module resets only their colours. Terminator reads its
+config at start, so close every Terminator window after installing. It also
+writes back the config it loaded when you save its preferences, so close it
+before re-running the module too.
 
 ### Dock
 
