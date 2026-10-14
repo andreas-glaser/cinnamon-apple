@@ -44,6 +44,8 @@ keymap("cinnamon-apple", {
     C("LC-Alt-Down"):           C("C-Super-Down"),              # Tile bottom half (terminals)
     C("Super-RC-Alt-m"):        C("C-Alt-Super-m"),             # Toggle Mac keyboard
     C("LC-RC-Alt-m"):           C("C-Alt-Super-m"),             # Toggle Mac keyboard (terminals)
+    C("Super-RC-Alt-d"):        C("C-Alt-Super-d"),             # Toggle dark mode
+    C("LC-RC-Alt-d"):           C("C-Alt-Super-d"),             # Toggle dark mode (terminals)
     C("Super-RC-q"):            C("C-Alt-q"),                   # Lock screen
     C("LC-RC-q"):               C("C-Alt-q"),                   # Lock screen (terminals)
     C("Super-RC-t"):            C("C-Alt-t"),                   # Open terminal

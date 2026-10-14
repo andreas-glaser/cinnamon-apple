@@ -1,0 +1,176 @@
+#!/usr/bin/python3 -I
+"""Switch the desktop between dark and light mode.
+
+Usage: cinnamon-apple-appearance [dark|light]
+
+Without an argument the mode flips. It does what the Mode buttons in Themes
+do, keeping the current colour, so the theme must be one of the styles listed
+there. Light returns to the mode used before going dark, light or mixed (a dark
+panel). Then every executable in ~/.config/cinnamon-apple/appearance.d runs
+with "dark" or "light", e.g. to switch the terminal along.
+"""
+import json
+import os
+import subprocess
+import sys
+
+from gi.repository import Gio, GLib
+
+INTERFACE = "org.cinnamon.desktop.interface"
+CINNAMON_THEME = "org.cinnamon.theme"
+PORTAL = "org.x.apps.portal"
+# Values of org.x.apps.portal color-scheme, as set by Themes for each mode.
+COLOR_SCHEMES = {"mixed": "default", "dark": "prefer-dark", "light": "prefer-light"}
+
+STATE_HOME = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
+LIGHT_MODE = os.path.join(STATE_HOME, "cinnamon-apple", "light-mode")
+HOOKS = os.path.join(GLib.get_user_config_dir(), "cinnamon-apple", "appearance.d")
+
+DATA_DIRS = [GLib.get_user_data_dir(), *GLib.get_system_data_dirs()]
+THEME_DIRS = [os.path.expanduser("~/.themes")] + [os.path.join(d, "themes") for d in DATA_DIRS]
+ICON_DIRS = [os.path.expanduser("~/.icons")] + [os.path.join(d, "icons") for d in DATA_DIRS]
+
+
+class AppearanceError(Exception):
+    pass
+
+
+def variant_themes(variant):
+    """The (gtk, icons, cinnamon, cursor) themes of a style variant, read as Themes does."""
+    every = variant.get("themes")
+    return (
+        variant.get("gtk", every),
+        variant.get("icons", every),
+        variant.get("cinnamon", every),
+        variant.get("cursor", every),
+    )
+
+
+def load_styles():
+    styles = {}
+    for data_dir in reversed(GLib.get_system_data_dirs()):
+        path = os.path.join(data_dir, "cinnamon", "styles.d")
+        if not os.path.isdir(path):
+            continue
+        for filename in sorted(os.listdir(path)):
+            if filename.endswith(".styles"):
+                with open(os.path.join(path, filename)) as f:
+                    for style in json.load(f)["styles"]:
+                        styles[style["name"]] = style
+    return styles
+
+
+def installed(themes):
+    gtk, icons, cinnamon, cursor = themes
+    def found(name, dirs):
+        return name is not None and any(os.path.isdir(os.path.join(d, name)) for d in dirs)
+    return (
+        found(gtk, THEME_DIRS)
+        and found(icons, ICON_DIRS)
+        and (cinnamon == "cinnamon" or found(cinnamon, THEME_DIRS))
+        and found(cursor, ICON_DIRS)
+    )
+
+
+def current_themes():
+    interface = Gio.Settings.new(INTERFACE)
+    return (
+        interface.get_string("gtk-theme"),
+        interface.get_string("icon-theme"),
+        Gio.Settings.new(CINNAMON_THEME).get_string("name"),
+        interface.get_string("cursor-theme"),
+    )
+
+
+def find_active(styles, themes):
+    for style in styles.values():
+        for mode in COLOR_SCHEMES:
+            for variant in style.get(mode, []):
+                if variant_themes(variant) == themes:
+                    return style, mode, variant
+    raise AppearanceError(
+        "the current theme is not one of the styles in Themes; pick one there first"
+    )
+
+
+def pick_variant(style, mode, name):
+    """The variant with the same colour in another mode, else that mode's default, as in Themes."""
+    variants = [v for v in style.get(mode, []) if installed(variant_themes(v))]
+    if not variants:
+        raise AppearanceError(f"{style['name']} has no {mode} mode installed")
+    for variant in variants:
+        if variant["name"] == name:
+            return variant
+    return next((v for v in variants if v.get("default") == "true"), variants[0])
+
+
+def saved_light_mode():
+    try:
+        with open(LIGHT_MODE) as f:
+            mode = f.read().strip()
+    except FileNotFoundError:
+        return "light"
+    return mode if mode in ("mixed", "light") else "light"
+
+
+def apply(mode, themes):
+    gtk, icons, cinnamon, cursor = themes
+    Gio.Settings.new(PORTAL).set_string("color-scheme", COLOR_SCHEMES[mode])
+    interface = Gio.Settings.new(INTERFACE)
+    interface.set_string("gtk-theme", gtk)
+    interface.set_string("icon-theme", icons)
+    interface.set_string("cursor-theme", cursor)
+    Gio.Settings.new(CINNAMON_THEME).set_string("name", cinnamon)
+    Gio.Settings.sync()
+
+
+def run_hooks(appearance):
+    if not os.path.isdir(HOOKS):
+        return
+    failed = []
+    for name in sorted(os.listdir(HOOKS)):
+        path = os.path.join(HOOKS, name)
+        if not (os.path.isfile(path) and os.access(path, os.X_OK)):
+            continue
+        try:
+            subprocess.run([path, appearance], check=True, timeout=30)
+        except (OSError, subprocess.SubprocessError) as err:
+            print(f"{name}: {err}", file=sys.stderr)
+            failed.append(name)
+    if failed:
+        raise AppearanceError(f"{', '.join(failed)} in {HOOKS} failed")
+
+
+def main(args):
+    if args not in ([], ["dark"], ["light"]):
+        sys.exit(__doc__.splitlines()[2])
+    style, mode, variant = find_active(load_styles(), current_themes())
+    want = args[0] if args else ("light" if mode == "dark" else "dark")
+
+    if want == "dark" and mode != "dark":
+        os.makedirs(os.path.dirname(LIGHT_MODE), exist_ok=True)
+        with open(LIGHT_MODE, "w") as f:
+            f.write(mode + "\n")
+        target = "dark"
+    elif want == "light" and mode == "dark":
+        target = saved_light_mode()
+        if target not in style:
+            target = "light"
+    else:
+        target = mode
+    if target != mode:
+        apply(target, variant_themes(pick_variant(style, target, variant["name"])))
+    run_hooks(want)
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except Exception as err:
+        # Usually run from a shortcut, where nobody sees stderr.
+        subprocess.run(
+            ["notify-send", "--app-name=cinnamon-apple", "--icon=preferences-desktop-theme",
+             f"Appearance switch failed: {err}"],
+            timeout=10,
+        )
+        raise

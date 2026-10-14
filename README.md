@@ -36,6 +36,7 @@ run, e.g. `DOCK_POSITION=left ./install.sh dock`.
 | `quicklook`   | Space to preview files in Nemo                         |
 | `dock`        | Plank dock at the bottom, panel at the top as menu bar |
 | `toggle`      | Ctrl+Alt+Win+M switches the Mac keyboard off and on    |
+| `appearance`  | Ctrl+Alt+Win+D switches between dark and light mode    |
 
 ### Keyboard
 
@@ -151,6 +152,24 @@ same keys switch it back on. Your shortcuts are saved in
 you log in.
 
 From a terminal: `cinnamon-apple-toggle`, or `cinnamon-apple-toggle off` / `on`.
+
+### Appearance
+
+Ctrl+Alt+Win+D switches between dark and light mode. macOS has no shortcut for
+this; the keys are Ctrl+Option+Cmd+D on a Mac keyboard. It does what the Mode
+buttons under System Settings > Themes do: the colour you picked stays, and
+apps that follow the system's dark mode preference switch along. Going light
+returns to the mode you came from, so Mint's default mixed mode (light windows,
+dark panel) comes back as it was. The theme has to be one of the styles listed
+in Themes; with a custom combination a notification says so and nothing
+changes. Like the other shortcuts, it is off while the Mac keyboard is
+switched off.
+
+To switch other things along, put an executable in
+`~/.config/cinnamon-apple/appearance.d/`. Each one runs afterwards with `dark`
+or `light` as its argument, e.g. a script that changes the terminal's profile.
+
+From a terminal: `cinnamon-apple-appearance`, or `cinnamon-apple-appearance dark` / `light`.
 
 ### Dock
 
