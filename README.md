@@ -96,19 +96,31 @@ swap them, as on a stock Mac.
 
 ### Launcher
 
-Installs Ulauncher from `ppa:agornostal/ulauncher`, sets its hotkey to
-Alt+Space and starts it at login. Cinnamon's own Alt+Space binding (window
-menu) is cleared to make room.
+Installs Ulauncher from `ppa:agornostal/ulauncher`, opens it with Alt+Space
+and starts it at login. The hotkey is a Cinnamon shortcut running
+`ulauncher-toggle`, so Ulauncher's own hotkey setting is left empty. Cinnamon's
+Alt+Space binding (window menu) is cleared to make room.
 
 ### Window
 
-| Shortcut      | Action                                   |
-|---------------|------------------------------------------|
-| Alt+Q         | Close window (Alt+F4 still works)        |
-| Alt+M, Alt+H  | Minimize                                 |
-| Ctrl+Alt+F    | Toggle fullscreen                        |
-| Ctrl+Alt+Q    | Lock screen (Ctrl+Alt+L still works)     |
-| Ctrl+Alt+T    | Open a terminal (Cinnamon default)       |
+| Shortcut        | Action                                   |
+|-----------------|------------------------------------------|
+| Alt+Q           | Close window (Alt+F4 still works)        |
+| Alt+M, Alt+H    | Minimize                                 |
+| Ctrl+Alt+F      | Toggle fullscreen                        |
+| Ctrl+Win+F      | Fill the screen (toggles maximize)       |
+| Ctrl+Win+C      | Center                                   |
+| Ctrl+Win+R      | Return to previous size                  |
+| Ctrl+Win+arrows | Tile to that half of the screen          |
+| Ctrl+Alt+Q      | Lock screen (Ctrl+Alt+L still works)     |
+| Ctrl+Alt+T      | Open a terminal (Cinnamon default)       |
+
+Ctrl+Win stands in for Fn+Ctrl, the macOS window tiling shortcuts, since a PC
+keyboard's Fn key never reaches the system. They use Cinnamon's tiling, which
+differs from macOS in two ways: arrows push the window, so Up then Right gives
+the top-right quarter and the opposite arrow undoes the last step; and Return
+to previous size restores the size but leaves the window where it was tiled.
+Super+arrows (Cinnamon's own tiling) and Alt+F10 still work.
 
 Close, minimize and maximize move to the left of the title bar.
 

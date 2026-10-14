@@ -27,6 +27,21 @@ keymap("cinnamon-apple", {
     C("RC-M"):                  C("Alt-m"),                     # Minimize
     C("Super-RC-f"):            C("C-Alt-f"),                   # Fullscreen
     C("LC-RC-f"):               C("C-Alt-f"),                   # Fullscreen (terminals)
+    # Ctrl+Win stands in for Fn+Ctrl window tiling; Ctrl is Super in GUI apps, LC in terminals
+    C("Super-Alt-f"):           C("C-Super-f"),                 # Fill (maximize toggle)
+    C("LC-Alt-f"):              C("C-Super-f"),                 # Fill (terminals)
+    C("Super-Alt-c"):           C("C-Super-c"),                 # Center
+    C("LC-Alt-c"):              C("C-Super-c"),                 # Center (terminals)
+    C("Super-Alt-r"):           C("C-Super-r"),                 # Return to previous size
+    C("LC-Alt-r"):              C("C-Super-r"),                 # Return to previous size (terminals)
+    C("Super-Alt-Left"):        C("C-Super-Left"),              # Tile left half
+    C("LC-Alt-Left"):           C("C-Super-Left"),              # Tile left half (terminals)
+    C("Super-Alt-Right"):       C("C-Super-Right"),             # Tile right half
+    C("LC-Alt-Right"):          C("C-Super-Right"),             # Tile right half (terminals)
+    C("Super-Alt-Up"):          C("C-Super-Up"),                # Tile top half
+    C("LC-Alt-Up"):             C("C-Super-Up"),                # Tile top half (terminals)
+    C("Super-Alt-Down"):        C("C-Super-Down"),              # Tile bottom half
+    C("LC-Alt-Down"):           C("C-Super-Down"),              # Tile bottom half (terminals)
     C("Super-RC-q"):            C("C-Alt-q"),                   # Lock screen
     C("LC-RC-q"):               C("C-Alt-q"),                   # Lock screen (terminals)
     C("Super-RC-t"):            C("C-Alt-t"),                   # Open terminal
