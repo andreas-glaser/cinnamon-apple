@@ -26,6 +26,16 @@ fi
 
 for module in "${modules[@]}"; do
     [[ -f $module ]] || { echo "No such module: $module" >&2; exit 1; }
+done
+
+# Modules change the shortcuts the toggle saved; restore them first so turning
+# it back on later does not undo this run.
+if [[ -f ${XDG_STATE_HOME:-$HOME/.local/state}/cinnamon-apple/mac-keyboard.json ]]; then
+    log "Turning the Mac keyboard back on"
+    "$ROOT/files/cinnamon-apple-toggle" on
+fi
+
+for module in "${modules[@]}"; do
     log "$(basename "$module" .sh)"
     # shellcheck source=/dev/null
     source "$module"

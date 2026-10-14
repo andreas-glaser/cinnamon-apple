@@ -1,6 +1,7 @@
 # cinnamon-apple
 
 Makes Linux Mint Cinnamon behave more like macOS. Alt plays the role of Cmd.
+Ctrl+Alt+Win+M switches it off and on again, e.g. for a game.
 
 ## Requirements
 
@@ -34,6 +35,7 @@ run, e.g. `DOCK_POSITION=left ./install.sh dock`.
 | `touchpad`    | Tap to click, three-finger gestures                    |
 | `quicklook`   | Space to preview files in Nemo                         |
 | `dock`        | Plank dock at the bottom, panel at the top as menu bar |
+| `toggle`      | Ctrl+Alt+Win+M switches the Mac keyboard off and on    |
 
 ### Keyboard
 
@@ -64,8 +66,8 @@ and re-run `./install.sh keyboard`. To switch remapping off for everything,
 use Stop Toshy Services in the Toshy tray menu (Re/Start turns it back on).
 
 Cinnamon's own shortcuts from the other modules (Alt+Q, Alt+H, Alt+M,
-Alt+Space, Shift+Alt+3/4/5) still work in those apps. If a game uses one of
-them, skip the module that sets it.
+Alt+Space, Shift+Alt+3/4/5) still work in those apps. For a game that uses
+them, switch the Mac keyboard off with the [toggle](#toggle).
 
 The Toshy installer runs only if Toshy is not installed yet; re-running the
 module just refreshes the keymap and the app list. Its questions are
@@ -137,6 +139,18 @@ Cinnamon's two-finger swipe gestures (window tiling) are turned off so
 sideways scrolling does not tile windows. Scroll direction is left as it is
 unless `NATURAL_SCROLL` in `config.sh` is `true` (content follows your fingers,
 as on macOS) or `false` (traditional).
+
+### Toggle
+
+Ctrl+Alt+Win+M switches between the Mac keyboard and stock Cinnamon, for games
+such as Dota 2 that use Alt shortcuts. Off stops Toshy and resets every
+shortcut cinnamon-apple sets to Cinnamon's default, so Alt is plain Alt and
+Alt+Q no longer closes the window; a notification says which mode is on. The
+same keys switch it back on. Your shortcuts are saved in
+`~/.local/state/cinnamon-apple/` while it is off, and it switches back on when
+you log in.
+
+From a terminal: `cinnamon-apple-toggle`, or `cinnamon-apple-toggle off` / `on`.
 
 ### Dock
 

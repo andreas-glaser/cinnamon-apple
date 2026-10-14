@@ -10,6 +10,10 @@ fi
 # Cinnamon binds Alt+Space to the window menu, which would swallow the hotkey.
 gsettings set "$KEYS_SCHEMA.wm" activate-window-menu "[]"
 
+# Cinnamon owns the hotkey rather than Ulauncher, so the toggle module can turn
+# it off with the other shortcuts.
+set_keybinding custom-cinnamon-apple-launcher "Ulauncher" "ulauncher-toggle" "<Alt>space"
+
 # Ulauncher rewrites its settings file on exit, so stop it before editing.
 pkill -f /usr/bin/ulauncher || true
 
@@ -20,7 +24,8 @@ settings = {}
 if os.path.exists(path):
     with open(path) as f:
         settings = json.load(f)
-settings["hotkey-show-app"] = "<Alt>space"
+# Empty, not absent: a missing hotkey makes Ulauncher grab Ctrl+Space.
+settings["hotkey-show-app"] = ""
 os.makedirs(os.path.dirname(path), exist_ok=True)
 with open(path, "w") as f:
     json.dump(settings, f, indent=4)
