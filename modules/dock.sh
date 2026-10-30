@@ -3,6 +3,8 @@
 # list, launchers and separators are removed, since the dock does that job. The
 # original panel layout is saved once to
 # ~/.local/state/cinnamon-apple/panel-backup.sh; run it with bash to restore.
+# Plank Reloaded comes from its author's apt repository, whose signing key is
+# checked against a pinned fingerprint.
 
 PLANK_REPO=https://zquestz.github.io/ppa/ubuntu
 PLANK_KEY_FINGERPRINT=B6DE3514E07E30BB5F408D74E49B7E0000228DDD

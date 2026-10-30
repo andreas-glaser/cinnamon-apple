@@ -1,4 +1,5 @@
-# Ulauncher as a Spotlight replacement on Alt+Space.
+# Ulauncher as a Spotlight replacement on Alt+Space, installed from the
+# third-party ppa:agornostal/ulauncher.
 
 if ! dpkg -s ulauncher >/dev/null 2>&1; then
     sudo add-apt-repository -y ppa:agornostal/ulauncher

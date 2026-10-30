@@ -14,9 +14,16 @@ single uninstall step, so read what a module does before running it.
 ```sh
 git clone https://github.com/andreas-glaser/cinnamon-apple.git
 cd cinnamon-apple
-./install.sh              # everything
-./install.sh screenshots  # only selected modules
+./install.sh              # describe each module and ask which to set up
+./install.sh --list       # only describe them
+./install.sh --all        # set up everything without asking
+./install.sh screenshots  # set up only the named modules
 ```
+
+Without arguments the installer shows what each module does and asks whether
+to set it up, then lists your choices once more before changing anything. Each
+step is announced as it runs, including which packages are installed with
+`sudo`; if a module fails, the installer stops and names it.
 
 Safe to re-run. Run as your normal user; it calls `sudo` for package installs.
 

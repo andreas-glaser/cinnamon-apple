@@ -14,6 +14,7 @@ apt_install() {
         dpkg -s "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
     done
     if ((${#missing[@]})); then
+        log "Installing ${missing[*]} with apt (needs sudo)"
         sudo apt-get install -y "${missing[@]}"
     fi
 }
