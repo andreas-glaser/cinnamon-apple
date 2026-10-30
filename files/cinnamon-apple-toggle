@@ -4,8 +4,7 @@
 Usage: cinnamon-apple-toggle [on|off]
 
 Without an argument the current mode flips. Off saves the shortcuts
-cinnamon-apple sets, resets them to Cinnamon's defaults and stops Toshy; on
-restores them and starts Toshy again.
+cinnamon-apple sets and resets them to Cinnamon's defaults; on restores them.
 """
 import json
 import os
@@ -34,19 +33,10 @@ SHORTCUTS = {
 }
 CUSTOM_PREFIX = "custom-cinnamon-apple-"
 TOGGLE_ID = CUSTOM_PREFIX + "toggle"
-TOSHY = "toshy-config.service"
 
 STATE_HOME = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
 # Present only while the Mac keyboard is off.
 SAVED = os.path.join(STATE_HOME, "cinnamon-apple", "mac-keyboard.json")
-
-
-def toshy(action):
-    installed = subprocess.run(
-        ["systemctl", "--user", "cat", TOSHY], capture_output=True, timeout=30
-    ).returncode == 0
-    if installed:
-        subprocess.run(["systemctl", "--user", action, TOSHY], check=True, timeout=30)
 
 
 def notify(text):
@@ -70,7 +60,6 @@ def write_json(path, data):
 
 def turn_off():
     if os.path.exists(SAVED):
-        toshy("stop")
         return
     keybindings = Gio.Settings.new(KEYS)
     custom_list = keybindings.get_strv("custom-list")
@@ -92,13 +81,11 @@ def turn_off():
             settings.reset(key)
     keybindings.set_strv("custom-list", [name for name in custom_list if name not in saved["custom"]])
     Gio.Settings.sync()
-    toshy("stop")
     notify("Mac keyboard off")
 
 
 def turn_on():
     if not os.path.exists(SAVED):
-        toshy("start")
         return
     with open(SAVED) as f:
         saved = json.load(f)
@@ -113,7 +100,6 @@ def turn_on():
         "custom-list", custom_list + [name for name in saved["custom"] if name not in custom_list]
     )
     Gio.Settings.sync()
-    toshy("start")
     os.remove(SAVED)
     notify("Mac keyboard on")
 

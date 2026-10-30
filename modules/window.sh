@@ -15,7 +15,7 @@ gsettings set "$KEYS_SCHEMA.media-keys" screensaver \
     "['<Primary><Alt>l', 'XF86ScreenSaver', '<Primary><Alt>q']"
 
 # Ctrl+Win stands in for Fn+Ctrl, macOS's window tiling modifier, which a PC
-# keyboard cannot send. Without Toshy, Ctrl+Win arrives as Ctrl+Super itself.
+# keyboard cannot send.
 gsettings set "$KEYS_SCHEMA.wm" toggle-maximized "['<Alt>F10', '<Primary><Super>f']"
 gsettings set "$KEYS_SCHEMA.wm" move-to-center "['<Primary><Super>c']"
 gsettings set "$KEYS_SCHEMA.wm" unmaximize "['<Alt>F5', '<Primary><Super>r']"

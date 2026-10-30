@@ -1,7 +1,7 @@
 # cinnamon-apple
 
 Makes Linux Mint Cinnamon behave more like macOS. Alt plays the role of Cmd.
-Ctrl+Alt+Win+M switches it off and on again, e.g. for a game.
+Ctrl+Alt+Win+M switches the shortcuts off and on again, e.g. for a game.
 
 ## Requirements
 
@@ -28,61 +28,43 @@ run, e.g. `DOCK_POSITION=left ./install.sh dock`.
 
 | Module        | What it does                                           |
 |---------------|--------------------------------------------------------|
-| `keyboard`    | macOS keyboard layout everywhere via Toshy             |
+| `keyboard`    | Alt+C/V/X/Z and other Cmd shortcuts in every app       |
 | `screenshots` | Flameshot with macOS screenshot shortcuts              |
 | `launcher`    | Ulauncher (Spotlight replacement) on Alt+Space         |
 | `window`      | macOS window shortcuts, title bar buttons on the left  |
 | `touchpad`    | Tap to click, three-finger gestures                    |
 | `quicklook`   | Space to preview files in Nemo                         |
 | `dock`        | Plank dock at the bottom, panel at the top as menu bar |
-| `toggle`      | Ctrl+Alt+Win+M switches the Mac keyboard off and on    |
+| `toggle`      | Ctrl+Alt+Win+M switches the Mac shortcuts off and on   |
 | `appearance`  | Ctrl+Alt+Win+D switches between dark and light mode    |
 | `terminal`    | Terminator light/dark profiles that follow the mode    |
 
 ### Keyboard
 
-Installs [Toshy](https://github.com/RedBearAK/toshy) (pinned release, commit
-hash verified) so a PC keyboard behaves like a Mac one in every app:
+| Shortcut       | Action           | In terminals sends |
+|----------------|------------------|--------------------|
+| Alt+C          | Copy             | Ctrl+Shift+C       |
+| Alt+V          | Paste            | Ctrl+Shift+V       |
+| Alt+X          | Cut              | nothing            |
+| Alt+Z          | Undo             | nothing            |
+| Shift+Alt+Z    | Redo             | nothing            |
+| Alt+A          | Select all       | Ctrl+Shift+A       |
+| Alt+F          | Find             | Ctrl+Shift+F       |
+| Alt+T          | New tab          | Ctrl+Shift+T       |
+| Alt+W          | Close tab        | Ctrl+Shift+W       |
 
-| Physical key | Acts as |
-|--------------|---------|
-| Alt          | Cmd     |
-| Win          | Option  |
-| Ctrl         | Ctrl    |
+Each is a Cinnamon shortcut that runs `cinnamon-apple-key`, which sends the
+Ctrl version of the key to the focused window with `xdotool`. In terminals it
+sends the Ctrl+Shift version instead, so Ctrl+C still interrupts, and Alt+Z
+does nothing rather than suspend the running program. When the clipboard holds
+an image, Alt+V in a terminal sends Ctrl+V, so tools like Claude Code can paste
+screenshots. Terminals are recognised by window class; the list is in
+`files/cinnamon-apple-key`.
 
-Alt+C/V/X/Z/A/T/W/F work as on macOS, in terminals too (where Ctrl+C still
-interrupts). In terminals Alt+V sends Ctrl+V when the clipboard holds an image,
-so tools like Claude Code can paste screenshots, and Ctrl+Shift+V otherwise.
-The other shortcuts in this README keep working because a small keymap
-translates them for Cinnamon; it lives in Toshy's `user_apps` slice in
-`~/.config/toshy/toshy_config.py` between `cinnamon-apple` markers and survives
-Toshy upgrades. Anything else you put in that slice is left alone.
-
-Games get the plain PC keyboard: Alt is Alt and none of the Mac shortcuts
-apply. Toshy treats them like a virtual machine or remote desktop, which it
-leaves unremapped. `PC_KEYBOARD_APPS` in `config.sh` lists them as patterns
-matched against the window class; the default covers Steam games through
-Proton, anything running in Wine (Lutris, Heroic, Bottles) and gamescope. For a
-native game, run `xprop WM_CLASS`, click its window, add the class to the list
-and re-run `./install.sh keyboard`. To switch remapping off for everything,
-use Stop Toshy Services in the Toshy tray menu (Re/Start turns it back on).
-
-Cinnamon's own shortcuts from the other modules (Alt+Q, Alt+H, Alt+M,
-Alt+Space, Shift+Alt+3/4/5) still work in those apps. For a game that uses
-them, switch the Mac keyboard off with the [toggle](#toggle).
-
-The Toshy installer runs only if Toshy is not installed yet; re-running the
-module just refreshes the keymap and the app list. Its questions are
-pre-answered, so expect only the sudo password prompt.
-
-Security: Toshy reads all keyboard input and injects key events. Its installer
-grants your user access to input devices and `/dev/uinput` (udev rule plus the
-`input` group), so any program you run gets that access too. On X11 programs
-can already read and inject keys through the X server, so the added exposure
-is small; it matters more on Wayland. The installer also pulls the keymapper
-`xwaykeyz` from its `main` branch, which cannot be pinned.
-
-To remove Toshy, clone the same release and run `./setup_toshy.py uninstall`.
+Nothing watches the keyboard; only these key combinations reach the script.
+The trade-off is that apps no longer receive these Alt keys themselves, such as
+Alt+F for a File menu, and that holding a key repeats slightly slower than a
+real Ctrl shortcut. Win is not remapped, and Ctrl keeps working as usual.
 
 ### Screenshots
 
@@ -144,10 +126,9 @@ as on macOS) or `false` (traditional).
 
 ### Toggle
 
-Ctrl+Alt+Win+M switches between the Mac keyboard and stock Cinnamon, for games
-such as Dota 2 that use Alt shortcuts. Off stops Toshy and resets every
-shortcut cinnamon-apple sets to Cinnamon's default, so Alt is plain Alt and
-Alt+Q no longer closes the window; a notification says which mode is on. The
+Ctrl+Alt+Win+M switches between the Mac shortcuts and stock Cinnamon, for games
+such as Dota 2 that use Alt shortcuts. Off resets every shortcut cinnamon-apple
+sets to Cinnamon's default, so Alt+Q no longer closes the window; a notification says which mode is on. The
 same keys switch it back on. Your shortcuts are saved in
 `~/.local/state/cinnamon-apple/` while it is off, and it switches back on when
 you log in.
@@ -163,7 +144,7 @@ apps that follow the system's dark mode preference switch along. Going light
 returns to the mode you came from, so Mint's default mixed mode (light windows,
 dark panel) comes back as it was. The theme has to be one of the styles listed
 in Themes; with a custom combination a notification says so and nothing
-changes. Like the other shortcuts, it is off while the Mac keyboard is
+changes. Like the other shortcuts, it is off while the Mac shortcuts are
 switched off.
 
 To switch other things along, put an executable in

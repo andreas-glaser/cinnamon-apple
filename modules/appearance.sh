@@ -8,5 +8,4 @@ appearance="$HOME/.local/bin/cinnamon-apple-appearance"
 install -D -m 0755 "$ROOT/files/cinnamon-apple-appearance" "$appearance"
 mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/cinnamon-apple/appearance.d"
 
-# Ctrl, Alt and Win together arrive the same with Toshy on or off.
 set_keybinding custom-cinnamon-apple-appearance "Toggle dark mode" "$appearance" "<Primary><Alt><Super>d"

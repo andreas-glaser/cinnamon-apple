@@ -9,8 +9,6 @@ KEYS = "org.cinnamon.desktop.keybindings"
 
 STUB = """#!/bin/sh
 echo "$(basename "$0") $*" >>"$STUB_LOG"
-[ "$1 $2" = "--user cat" ] && [ -f "$STUB_DIR/no-toshy" ] && exit 1
-exit 0
 """
 
 
@@ -27,7 +25,7 @@ class ToggleTest(unittest.TestCase):
         self.tmp = tmp.name
         bin_dir = os.path.join(self.tmp, "bin")
         os.mkdir(bin_dir)
-        for name in ["systemctl", "notify-send"]:
+        for name in ["notify-send"]:
             path = os.path.join(bin_dir, name)
             with open(path, "w") as f:
                 f.write(STUB)
@@ -40,7 +38,6 @@ class ToggleTest(unittest.TestCase):
             "XDG_STATE_HOME": os.path.join(self.tmp, "state"),
             "GSETTINGS_BACKEND": "keyfile",
             "STUB_LOG": self.log,
-            "STUB_DIR": self.tmp,
         }
         self.saved = os.path.join(self.tmp, "state", "cinnamon-apple", "mac-keyboard.json")
 
@@ -65,7 +62,7 @@ class ToggleTest(unittest.TestCase):
         with open(self.log) as f:
             calls = f.read().splitlines()
         os.remove(self.log)
-        return [c for c in calls if not c.startswith("systemctl --user cat")]
+        return calls
 
     def test_off_resets_shortcuts_and_on_restores_them(self):
         self.assertEqual(self.toggle("off").returncode, 0)
@@ -74,9 +71,8 @@ class ToggleTest(unittest.TestCase):
         self.assertEqual(self.gget(KEYS, "custom-list"), "['custom0', 'custom-cinnamon-apple-toggle']")
         self.assertTrue(os.path.exists(self.saved))
         calls = self.calls()
-        self.assertIn("systemctl --user stop toshy-config.service", calls)
-        self.assertTrue(calls[-1].startswith("notify-send"), calls)
-        self.assertIn("Mac keyboard off", calls[-1])
+        self.assertEqual(len(calls), 1, calls)
+        self.assertIn("Mac keyboard off", calls[0])
 
         self.gset(KEYS, "custom-list", "['custom0', 'custom-cinnamon-apple-toggle', 'custom1']")
         self.assertEqual(self.toggle("on").returncode, 0)
@@ -88,8 +84,8 @@ class ToggleTest(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.saved))
         calls = self.calls()
-        self.assertIn("systemctl --user start toshy-config.service", calls)
-        self.assertIn("Mac keyboard on", calls[-1])
+        self.assertEqual(len(calls), 1, calls)
+        self.assertIn("Mac keyboard on", calls[0])
 
     def test_no_argument_flips_the_mode(self):
         self.toggle()
@@ -104,16 +100,10 @@ class ToggleTest(unittest.TestCase):
         self.toggle("on")
         self.assertEqual(self.gget(WM, "close"), "['<Alt>F4', '<Alt>q']")
 
-    def test_on_while_on_only_starts_toshy(self):
+    def test_on_while_on_changes_nothing(self):
         self.assertEqual(self.toggle("on").returncode, 0)
-        self.assertEqual(self.calls(), ["systemctl --user start toshy-config.service"])
+        self.assertEqual(self.calls(), [])
         self.assertEqual(self.gget(WM, "close"), "['<Alt>F4', '<Alt>q']")
-
-    def test_works_without_toshy(self):
-        open(os.path.join(self.tmp, "no-toshy"), "w").close()
-        self.assertEqual(self.toggle("off").returncode, 0)
-        self.assertFalse(any(c.startswith("systemctl") for c in self.calls()))
-        self.assertEqual(self.gget(WM, "close"), "['<Alt>F4']")
 
     def test_rejects_unknown_argument(self):
         result = self.toggle("sideways")

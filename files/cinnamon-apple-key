@@ -1,0 +1,102 @@
+#!/usr/bin/python3 -I
+"""Send the PC shortcut for a macOS Cmd shortcut to the focused window.
+
+Usage: cinnamon-apple-key KEY
+
+KEY is one of the keys in APPS, e.g. "c" for Cmd+C. Terminals get the
+Ctrl+Shift form, so Ctrl+C still interrupts there, and keys they have no use
+for are dropped.
+"""
+import re
+import subprocess
+import sys
+
+APPS = {
+    "c": "ctrl+c",
+    "v": "ctrl+v",
+    "x": "ctrl+x",
+    "z": "ctrl+z",
+    "shift+z": "ctrl+shift+z",
+    "a": "ctrl+a",
+    "f": "ctrl+f",
+    "t": "ctrl+t",
+    "w": "ctrl+w",
+}
+TERMINALS = {
+    "c": "ctrl+shift+c",
+    "v": "ctrl+shift+v",
+    "a": "ctrl+shift+a",
+    "f": "ctrl+shift+f",
+    "t": "ctrl+shift+t",
+    "w": "ctrl+shift+w",
+}
+# Matched against the class part of WM_CLASS, lowercased.
+TERMINAL_CLASSES = {
+    "alacritty",
+    "foot",
+    "gnome-terminal",
+    "guake",
+    "kitty",
+    "konsole",
+    "mate-terminal",
+    "org.wezfurlong.wezterm",
+    "terminator",
+    "tilix",
+    "uxterm",
+    "xfce4-terminal",
+    "xterm",
+}
+
+
+def xprop(*args):
+    return subprocess.run(
+        ["xprop", *args], capture_output=True, text=True, check=True, timeout=2
+    ).stdout
+
+
+def focused_class():
+    window = re.search(r"window id # (0x[0-9a-f]+)", xprop("-root", "_NET_ACTIVE_WINDOW"))
+    if not window or int(window.group(1), 16) == 0:
+        return ""
+    names = re.findall(r'"([^"]*)"', xprop("-id", window.group(1), "WM_CLASS"))
+    return names[-1].lower() if names else ""
+
+
+def clipboard_has_image():
+    # Fails when the clipboard is empty or holds no TARGETS, which means no image.
+    targets = subprocess.run(
+        ["xclip", "-selection", "clipboard", "-t", "TARGETS", "-o"],
+        capture_output=True, text=True, timeout=2,
+    ).stdout.split()
+    return any(target.startswith("image/") for target in targets)
+
+
+def combo_for(key, window_class):
+    if window_class not in TERMINAL_CLASSES:
+        return APPS[key]
+    # Terminal paste only carries text. TUIs such as Claude Code read a
+    # clipboard image themselves when they receive a literal Ctrl+V.
+    if key == "v" and clipboard_has_image():
+        return "ctrl+v"
+    return TERMINALS.get(key)
+
+
+def main(args):
+    if len(args) != 1 or args[0] not in APPS:
+        sys.exit(__doc__.splitlines()[2])
+    combo = combo_for(args[0], focused_class())
+    if combo:
+        subprocess.run(["xdotool", "key", "--clearmodifiers", combo], check=True, timeout=5)
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except Exception as err:
+        # Run from a shortcut, where nobody sees stderr.
+        subprocess.run(
+            ["notify-send", "--app-name=cinnamon-apple", "--icon=input-keyboard",
+             f"Mac shortcut failed: {err}"],
+            timeout=10,
+        )
+        raise
