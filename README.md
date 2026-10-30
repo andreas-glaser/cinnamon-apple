@@ -22,7 +22,7 @@ Safe to re-run. Run as your normal user; it calls `sudo` for package installs.
 
 Options live in `config.sh` (screenshot destination, dock edge, scroll
 direction). An environment variable of the same name overrides the file for one
-run, e.g. `DOCK_POSITION=left ./install.sh dock`.
+run, e.g. `DOCK_POSITION=bottom ./install.sh dock`.
 
 ## Modules
 
@@ -34,7 +34,7 @@ run, e.g. `DOCK_POSITION=left ./install.sh dock`.
 | `window`      | macOS window shortcuts, title bar buttons on the left  |
 | `touchpad`    | Tap to click, three-finger gestures                    |
 | `quicklook`   | Space to preview files in Nemo                         |
-| `dock`        | Plank dock at the bottom, panel at the top as menu bar |
+| `dock`        | Plank dock on the left, panel at the top as menu bar   |
 | `toggle`      | Ctrl+Alt+Win+M switches the Mac shortcuts off and on   |
 | `appearance`  | Ctrl+Alt+Win+D switches between dark and light mode    |
 | `terminal`    | Terminator light/dark profiles that follow the mode    |
@@ -176,8 +176,9 @@ before re-running the module too.
 Installs [Plank Reloaded](https://github.com/zquestz/plank-reloaded) from its
 author's apt repository; the signing key is checked against a pinned
 fingerprint before the repository is added. The dock sits on the edge set by
-`DOCK_POSITION` in `config.sh` (bottom, left or right), with magnification,
-and hides when a window overlaps it. Drag apps onto it to pin them.
+`DOCK_POSITION` in `config.sh` (left by default, or bottom or right), with
+magnification, and hides when a window overlaps it. Drag apps onto it to pin
+them.
 
 Cinnamon's panel moves to the top and loses its window list, launchers and
 separators, which the dock replaces. The original layout is saved the first
