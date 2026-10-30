@@ -21,6 +21,7 @@ APPS = {
     "f": "ctrl+f",
     "t": "ctrl+t",
     "w": "ctrl+w",
+    "r": "ctrl+r",
 }
 TERMINALS = {
     "c": "ctrl+shift+c",

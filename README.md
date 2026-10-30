@@ -59,12 +59,13 @@ run, e.g. `DOCK_POSITION=bottom ./install.sh dock`.
 | Alt+F          | Find             | Ctrl+Shift+F       |
 | Alt+T          | New tab          | Ctrl+Shift+T       |
 | Alt+W          | Close tab        | Ctrl+Shift+W       |
+| Alt+R          | Reload           | nothing            |
 
 Each is a Cinnamon shortcut that runs `cinnamon-apple-key`, which sends the
 Ctrl version of the key to the focused window with `xdotool`. In terminals it
 sends the Ctrl+Shift version instead, so Ctrl+C still interrupts, and Alt+Z
-does nothing rather than suspend the running program. When the clipboard holds
-an image, Alt+V in a terminal sends Ctrl+V, so tools like Claude Code can paste
+and Alt+R do nothing rather than suspend the running program or start a
+history search. When the clipboard holds an image, Alt+V in a terminal sends Ctrl+V, so tools like Claude Code can paste
 screenshots. Terminals are recognised by window class; the list is in
 `files/cinnamon-apple-key`.
 

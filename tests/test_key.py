@@ -86,6 +86,15 @@ class KeyTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(calls, [])
 
+    def test_reload(self):
+        _, calls = self.key("r")
+        self.assertEqual(calls, ["xdotool keyup r key --clearmodifiers ctrl+r"])
+
+    def test_terminal_never_gets_reload(self):
+        result, calls = self.key("r", STUB_CLASS='"terminator", "Terminator"')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(calls, [])
+
     def test_no_focused_window_counts_as_app(self):
         _, calls = self.key("v", STUB_WINDOW="0x0")
         self.assertEqual(calls, ["xdotool keyup v key --clearmodifiers ctrl+v"])
