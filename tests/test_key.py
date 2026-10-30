@@ -57,29 +57,29 @@ class KeyTest(unittest.TestCase):
     def test_app_gets_ctrl(self):
         result, calls = self.key("c")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+c"])
+        self.assertEqual(calls, ["xdotool keyup c key --clearmodifiers ctrl+c"])
 
     def test_redo(self):
         _, calls = self.key("shift+z")
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+shift+z"])
+        self.assertEqual(calls, ["xdotool keyup z key --clearmodifiers ctrl+shift+z"])
 
     def test_terminal_gets_ctrl_shift(self):
         _, calls = self.key("c", STUB_CLASS='"terminator", "Terminator"')
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+shift+c"])
+        self.assertEqual(calls, ["xdotool keyup c key --clearmodifiers ctrl+shift+c"])
 
     def test_terminal_pastes_text_with_ctrl_shift_v(self):
         _, calls = self.key("v", STUB_CLASS='"terminator", "Terminator"',
                             STUB_TARGETS="TARGETS UTF8_STRING text/plain")
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+shift+v"])
+        self.assertEqual(calls, ["xdotool keyup v key --clearmodifiers ctrl+shift+v"])
 
     def test_terminal_pastes_image_with_ctrl_v(self):
         _, calls = self.key("v", STUB_CLASS='"terminator", "Terminator"',
                             STUB_TARGETS="TARGETS image/png")
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+v"])
+        self.assertEqual(calls, ["xdotool keyup v key --clearmodifiers ctrl+v"])
 
     def test_terminal_with_empty_clipboard_pastes_text(self):
         _, calls = self.key("v", STUB_CLASS='"terminator", "Terminator"')
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+shift+v"])
+        self.assertEqual(calls, ["xdotool keyup v key --clearmodifiers ctrl+shift+v"])
 
     def test_terminal_never_gets_ctrl_z(self):
         result, calls = self.key("z", STUB_CLASS='"terminator", "Terminator"')
@@ -88,7 +88,7 @@ class KeyTest(unittest.TestCase):
 
     def test_no_focused_window_counts_as_app(self):
         _, calls = self.key("v", STUB_WINDOW="0x0")
-        self.assertEqual(calls, ["xdotool key --clearmodifiers ctrl+v"])
+        self.assertEqual(calls, ["xdotool keyup v key --clearmodifiers ctrl+v"])
 
     def test_rejects_unknown_key(self):
         result, calls = self.key("q")

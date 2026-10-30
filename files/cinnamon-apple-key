@@ -86,7 +86,11 @@ def main(args):
         sys.exit(__doc__.splitlines()[2])
     combo = combo_for(args[0], focused_class())
     if combo:
-        subprocess.run(["xdotool", "key", "--clearmodifiers", combo], check=True, timeout=5)
+        # Cinnamon holds a keyboard grab until the shortcut's letter is
+        # released, and keys sent before then never reach the window.
+        letter = args[0].split("+")[-1]
+        subprocess.run(["xdotool", "keyup", letter, "key", "--clearmodifiers", combo],
+                       check=True, timeout=5)
 
 
 if __name__ == "__main__":
